@@ -1,8 +1,10 @@
 package model
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 )
 
 type PublicationStatus string
@@ -13,9 +15,24 @@ const (
 	PublicationStatusPublished PublicationStatus = "published"
 )
 
-type PublicationStatusCount struct {
-	Total  int
-	Status PublicationStatus
+type PublicationAddData struct {
+	Status           PublicationStatus
+	ErrorCode        string
+	ErrorDescription string
+	PostId           int
+	IntCredentialId  int
+}
+
+type PublicationAddFailedData struct {
+	ErrorCode        string
+	ErrorDescription string
+	PostId           int
+	IntCredentialId  int
+}
+
+type PublicationAddPublishedData struct {
+	PostId          int
+	IntCredentialId int
 }
 
 type Publication struct {
@@ -28,42 +45,73 @@ func NewPublication(db *sql.DB) *Publication {
 	return &publication
 }
 
-func (p *Publication) CountByPost(postId int) (map[PublicationStatus]int, error) {
-	posts := map[PublicationStatus]int{}
+func (p *Publication) Finished(publication PublicationAddPublishedData) (int, error) {
+	return p.Add(PublicationAddData{
+		Status:          PublicationStatusPublished,
+		PostId:          publication.PostId,
+		IntCredentialId: publication.IntCredentialId,
+	})
+}
 
-	rows, rowsErr := p.db.Query(
-		`SELECT COUNT(*) total, publication.publication_status status
-        FROM publication
-        WHERE publication.post_id = ?
-        GROUP BY publication.publication_status`, postId,
+func (p *Publication) Failed(publication PublicationAddFailedData) (int, error) {
+	return p.Add(PublicationAddData{
+		Status:           PublicationStatusFailed,
+		ErrorCode:        publication.ErrorCode,
+		ErrorDescription: publication.ErrorDescription,
+		PostId:           publication.PostId,
+		IntCredentialId:  publication.IntCredentialId,
+	})
+}
+
+func (p *Publication) Add(publication PublicationAddData) (int, error) {
+	var publicationId int
+
+	columnsList := []string{}
+	columnsValues := []any{
+		publication.Status,
+		publication.PostId,
+		publication.IntCredentialId,
+	}
+	labelList := []string{}
+
+	if publication.ErrorCode != "" {
+		columnsList = append(columnsList, "publication_error_code")
+		columnsValues = append(columnsValues, publication.ErrorCode)
+		labelList = append(labelList, "?")
+	}
+
+	if publication.ErrorDescription != "" {
+		columnsList = append(columnsList, "publication_error_desc")
+		columnsValues = append(columnsValues, publication.ErrorDescription)
+		labelList = append(labelList, "?")
+	}
+
+	labelListText := ""
+	columnsListText := ""
+
+	if len(columnsList) > 0 {
+		labelListText += "," + strings.Join(labelList, ",")
+		columnsListText += "," + strings.Join(columnsList, ",")
+	}
+
+	insertRes, insertErr := p.db.ExecContext(
+		context.Background(),
+		`INSERT INTO synk.publication (publication_status, post_id, int_credential_id`+columnsListText+`)
+        VALUES (?, ?, ?`+labelListText+`)`,
+		columnsValues...,
 	)
 
-	if rowsErr != nil {
-		return nil, fmt.Errorf("models.publication.listByPost: %s", rowsErr.Error())
+	if insertErr != nil {
+		return publicationId, fmt.Errorf("models.publication.add: %s", insertErr.Error())
 	}
 
-	defer rows.Close()
+	id, exception := insertRes.LastInsertId()
 
-	rowsErr = rows.Err()
-
-	if rowsErr != nil {
-		return nil, fmt.Errorf("models.publication.listByPost: %s", rowsErr.Error())
+	if exception != nil {
+		return publicationId, fmt.Errorf("models.publication.add: %s", exception.Error())
 	}
 
-	for rows.Next() {
-		var post PublicationStatusCount
+	publicationId = int(id)
 
-		exception := rows.Scan(
-			&post.Total,
-			&post.Status,
-		)
-
-		if exception != nil {
-			return nil, fmt.Errorf("models.publication.listByPost: %s", exception.Error())
-		}
-
-		posts[post.Status] = post.Total
-	}
-
-	return posts, nil
+	return publicationId, nil
 }
