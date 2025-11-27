@@ -1,0 +1,19 @@
+services:
+  app:
+    container_name: synk_queuer
+    build: .
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./:/app
+      - ./.cert:/cert
+      - ${ROOT_CERTIFICATE_FILE_PATH}:/cert/rootCA.pem:ro
+    command: go run .
+    env_file: .env
+
+    networks:
+      - synk_network
+
+networks:
+  synk_network:
+    external: true

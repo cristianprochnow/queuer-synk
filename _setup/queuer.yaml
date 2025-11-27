@@ -1,0 +1,175 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Synk
+meta:
+  id: wrk_ffd036cc92c14c0eb11d489688f43e8c
+  created: 1764114136647
+  modified: 1764114136647
+  description: ""
+collection:
+  - name: posts
+    meta:
+      id: fld_31bad8d3f4b1445c959a475bf1483aff
+      created: 1758844562640
+      modified: 1762904755846
+      sortKey: -1758844562640
+      description: ""
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOjR9LCJleHAiOjE3NjI5MDQ4NTIsImlhdCI6MTc2MjkwMzk1Mn0.M3KBkZ_GFHjJwJ5lPVpAlvY2bouUswfx14tw1THeNP8
+  - name: templates
+    meta:
+      id: fld_716be477168845c7be99633f6b2482d0
+      created: 1760051795472
+      modified: 1762904714215
+      sortKey: -1744550419801
+      description: ""
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOjR9LCJleHAiOjE3NjI5MDQ4NTIsImlhdCI6MTc2MjkwMzk1Mn0.M3KBkZ_GFHjJwJ5lPVpAlvY2bouUswfx14tw1THeNP8
+  - name: integration_profiles
+    meta:
+      id: fld_b5b9805128d34b8dbff35c0fdf9c0b4b
+      created: 1760137048704
+      modified: 1762904760882
+      sortKey: -1737403348381.5
+      description: ""
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOjR9LCJleHAiOjE3NjI5MDQ4NTIsImlhdCI6MTc2MjkwMzk1Mn0.M3KBkZ_GFHjJwJ5lPVpAlvY2bouUswfx14tw1THeNP8
+  - name: integration_credentials
+    meta:
+      id: fld_14a8534ca8804852b35612cf9fb72459
+      created: 1761507118347
+      modified: 1762904766762
+      sortKey: -1733829812671.75
+      description: ""
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOjR9LCJleHAiOjE3NjI5MDQ4NTIsImlhdCI6MTc2MjkwMzk1Mn0.M3KBkZ_GFHjJwJ5lPVpAlvY2bouUswfx14tw1THeNP8
+  - name: auth
+    meta:
+      id: fld_74deb13e5e1e472580303ce595f7bce8
+      created: 1762646232048
+      modified: 1762646675914
+      sortKey: -1762646232048
+      description: ""
+    children:
+      - name: users
+        meta:
+          id: fld_f7e846ae394948be947e4c27411b44a3
+          created: 1762648242203
+          modified: 1762648242203
+          sortKey: -1762648242203
+          description: ""
+  - name: publisher
+    meta:
+      id: fld_8ee809d61828451aaefdc4da1b3059fe
+      created: 1764114295799
+      modified: 1764114295799
+      sortKey: -1764114295799
+      description: ""
+    children:
+      - name: discord
+        meta:
+          id: fld_a4ef9d2c6c3e44a2adde1e129768b8da
+          created: 1764116145561
+          modified: 1764116145561
+          sortKey: -1764116145561
+          description: ""
+      - name: telegram
+        meta:
+          id: fld_d17bdc32bf7c492fac6e4e5a3d945bce
+          created: 1764178338529
+          modified: 1764178338529
+          sortKey: -1764178338529
+          description: ""
+  - name: queuer
+    meta:
+      id: fld_92cc4108ea5d41789a403970a43a12bb
+      created: 1764183772081
+      modified: 1764184633749
+      sortKey: -1764183772081
+      description: ""
+    children:
+      - url: "{{queuer_url}}/about"
+        name: about
+        meta:
+          id: req_df8040aae015482ab3bd11c1f7565139
+          created: 1764183828078
+          modified: 1764183840639
+          isPrivate: false
+          description: ""
+          sortKey: -1764183828078
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{queuer_url}}/send"
+        name: send
+        meta:
+          id: req_99c7c847a6764cdda526642f86dc9e3f
+          created: 1764184647541
+          modified: 1764205486920
+          isPrivate: false
+          description: ""
+          sortKey: -1764184645279
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"posts": [1]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_17f348be1e3a4e19bd9c186617245742
+    created: 1758844512931
+    modified: 1762903952748
+  cookies:
+    - id: 99e89c5d-5fd4-4bcd-aea0-ad4bc71fb9b4
+      key: refresh_token
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOjR9LCJleHAiOjE3NjM1MDg3NTIsImlhdCI6MTc2MjkwMzk1Mn0.iaKmc-pozjSmbZqScJ4NrLNq-OafV3YZdm-PwJySWIw
+      domain: localhost
+      path: /
+      secure: false
+      httpOnly: true
+      hostOnly: true
+environments:
+  name: Base Environment
+  meta:
+    id: env_6b47fc427beb40e5b81a9c6ea8fe0659
+    created: 1758844512928
+    modified: 1764183822432
+    isPrivate: false
+  data:
+    base_url: https://localhost:8082
+    auth_url: https://localhost:8083
+    publisher_url: https://localhost:8084
+    queuer_url: https://localhost:8085
