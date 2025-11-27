@@ -9,6 +9,8 @@ import (
 	"strings"
 	"synk/gateway/app/util"
 	"time"
+
+	"github.com/getsentry/sentry-go"
 )
 
 type Response struct {
@@ -24,9 +26,14 @@ type ResponseHeader struct {
 }
 
 const AUTH_TIMEOUT = time.Second * 5
+const SENTRY_LOG_TIMEOUT = time.Second * 5
 
 func WriteErrorResponse(w http.ResponseWriter, response any, route string, message string, status int) {
+	defer sentry.Flush(SENTRY_LOG_TIMEOUT)
+
 	util.LogRoute(route, message)
+
+	sentry.CaptureMessage("error(@queuer" + route + "): " + message)
 
 	jsonResp, _ := json.Marshal(response)
 
@@ -35,14 +42,22 @@ func WriteErrorResponse(w http.ResponseWriter, response any, route string, messa
 }
 
 func WriteSuccessResponse(w http.ResponseWriter, response any) {
+	defer sentry.Flush(SENTRY_LOG_TIMEOUT)
+
 	jsonResp, _ := json.Marshal(response)
+
+	sentry.CaptureMessage("success(@queuer): " + string(jsonResp))
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResp)
 }
 
 func WriteStatusResponse(w http.ResponseWriter, response any) {
+	defer sentry.Flush(SENTRY_LOG_TIMEOUT)
+
 	jsonResp, _ := json.Marshal(response)
+
+	sentry.CaptureMessage("status(@queuer): " + string(jsonResp))
 
 	w.WriteHeader(http.StatusMultiStatus)
 	w.Write(jsonResp)
